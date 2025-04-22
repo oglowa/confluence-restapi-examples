@@ -7,6 +7,9 @@
 #
 # (c) 2024 Oliver Glowa (glo03) / Arvato Systems GmbH
 #
+# Call:
+# ./read.sh
+#
 
 source ./common/env-restapi.sh
 
