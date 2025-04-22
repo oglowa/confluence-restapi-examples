@@ -21,12 +21,12 @@ Containing examples for the [Confluence REST API](https://developer.atlassian.co
 
 # How to use it
 
-1. copy the file `common/my.cfg.tpl` to `~/.restapi`
-2. rename the file to `~/.restapi\my.cfg`
-3. edit the file `~/.restapi/my.cfg`
-    - set the variables
-        - `CONF_BASE_URL_*` = URL's of your Confluence instance
-        - `CONF_PAT_*` = Personal access token for authentication
+1. Copy the file `common/my.cfg.tpl` to `~/.restapi`
+2. Rename the file to `~/.restapi/my.cfg`
+3. Edit the file `~/.restapi/my.cfg`
+    - Set the variables
+        - `CONF_BASE_URL_*` = URLs of your Confluence instance
+        - `CONF_PAT_*` = Personal access tokens for authentication to your Confluence instance
 
 # Notice
 
