@@ -13,36 +13,30 @@
 
 source ./common/env-restapi.sh
 
-
 REQ_01="${CONF_RESTAPI_URL}?expand=space&limit=10"
 REQ_02="${CONF_RESTAPI_URL}/scan?expand=space&limit=10"
 REQ_03="${CONF_RESTAPI_URL}?expand=space&limit=10&spaceKey=NMAS"
 REQ_04="${CONF_RESTAPI_URL}/scan?expand=space&limit=10&spaceKey=NMAS"
 
-echo -e "\n--------"
-echo "Browse OLD Variant"
-echo "--------"
-echo "${REQ_01}"
+execBrowse()  {
+  local __url=$1
+  local __expand=$2
+  local __msg=$3
 
-curl -s -H "${CONF_AUTH}" "${REQ_01}" | jq -r "${RESP_RESULTS}"
+  # Some output
+  printf "\n%s\n%s\n%s\n" "--------" "${__msg}" "--------"
+  printf "%s\n\n" "${__url}"
 
-echo -e "\n--------"
-echo "Scan NEW Variant"
-echo "--------"
-echo "${REQ_02}"
+  # Get the results
+  local __curlResult
+  __curlResult=$(curl -s -H "${CONF_AUTH}" "${__url}")
 
-curl -s -H "${CONF_AUTH}" "${REQ_02}" | jq -r "${RESP_RESULTS}"
+  # Print the result
+  jq -r "${__expand}"<<<"${__curlResult}"
+}
 
-echo -e "\n--------"
-echo "Browse OLD Variant with space key"
-echo "--------"
-echo "${REQ_03}"
+execBrowse "${REQ_01}" "${RESP_RESULTS}" "Browse OLD Variant"
+execBrowse "${REQ_02}" "${RESP_RESULTS}" "Scan NEW Variant"
+execBrowse "${REQ_03}" "${RESP_RESULTS}" "Browse OLD Variant with space key"
+execBrowse "${REQ_04}" "${RESP_RESULTS}" "Scan NEW Variant with space key"
 
-curl -s -H "${CONF_AUTH}" "${REQ_03}" | jq -r "${RESP_RESULTS}"
-
-echo -e "\n--------"
-echo "Scan NEW Variant with space key"
-echo "--------"
-echo "${REQ_04}"
-
-curl -s -H "${CONF_AUTH}" "${REQ_04}" | jq -r "${RESP_RESULTS}"

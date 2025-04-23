@@ -13,17 +13,20 @@
 
 source ./common/env-restapi.sh
 
-# set the maximum level of recursion
+# Set the maximum level of recursion
 MAX_LEVEL=2
 
-PAGE_ID=532951146
-#532951146 #98 Playground
-#125380876 #Health%20and%Public
-
+# Check
 if [ "$1" != "" ]; then
-  PAGE_ID=$1
+    PAGE_ID=$1
+  else
+    if [ "${PAGE_ID}" = "" ]; then
+        printf "\nNo PAGE_ID given!\n"
+        exit 30
+    fi
 fi
 
+# Set current level
 LEVEL=0
 if [ "$2" != "" ]; then
   LEVEL=$2
@@ -35,50 +38,52 @@ if [ ${LEVEL} -ge ${MAX_LEVEL} ]; then
   STOP_BRANCH=1
 fi
 
-# set the indentation by level
+# Set the indentation by level
 INDENT=$(printf "%-${LEVEL}s")$(printf "%-${LEVEL}s")
 
-# read the page
+# Read the page
 PARENT_URL="${CONF_RESTAPI_URL}/${PAGE_ID}?expand=space"
-CURL_RESULT=$(curl -s -H "${CONF_AUTH}" "${PARENT_URL}")
-PARENT_INFO=$(jq -r '.id + " [" + .space.key + "] \"" + .title +"\""'<<<"${CURL_RESULT}")
+PARENT_RESULT=$(curl -s -H "${CONF_AUTH}" "${PARENT_URL}")
+PARENT_INFO=$(jq -r '.id + " [" + .space.key + "] \"" + .title +"\""'<<<"${PARENT_RESULT}")
 
-# get the children URL
-CHILD_URL=$(jq -r '._expandable.children'<<<"${CURL_RESULT}")
+# Get the children URL
+CHILD_URL=$(jq -r '._expandable.children'<<<"${PARENT_RESULT}")
 CHILD_URL=${CONF_BASE_URL}${CHILD_URL}"/page?expand=space"
 
-# Some output
-echo -e "\n${INDENT}LEV.${LEVEL}"
-echo -e "${INDENT}│\t\t\t\t${PARENT_URL}"
-echo -e "${INDENT}│\t\t\t\t${CHILD_URL}"
+# Read the child pages
+CHILD_RESULT=$(curl -s -H "${CONF_AUTH}" "${CHILD_URL}")
+CHILD_MAX=$(jq -r '.size'<<<"${CHILD_RESULT}")
 
-# read the child pages
-CURL_RESULT=$(curl -s -H "${CONF_AUTH}" "${CHILD_URL}")
+# Some output
+printf "\n%sLEV.%s\n" "${INDENT}" "${LEVEL}"
+printf "%s│\t\t\t\t%s\n" "${INDENT}" "${PARENT_URL}"
+printf "%s│\t\t\t\t%s\n" "${INDENT}" "${CHILD_URL}"
+printf "%s├- Childs : %s (LEV.%s)\n" "${INDENT}" "${CHILD_MAX}" "${LEVEL}"
 
 CHILD_IDX=-1
-jq -r '.results[] | .id + " " + .space.key + " " + .title +""'<<<"${CURL_RESULT}" |
+jq -r '.results[] | .id + " " + .space.key + " " + .title +""'<<<"${CHILD_RESULT}" |
 {
   while read -r CHILD_PAGE_ID CHILD_SPACE CHILD_TITLE ; do
-    # looop through the child pages
+    # Loop through the child pages
     ((CHILD_IDX=CHILD_IDX+1))
 
-    # some output
-    echo "${INDENT}│"
-    echo "${INDENT}├- PAGE   : ${PARENT_INFO}"
-    echo "${INDENT}└- ${CHILD_IDX}.CHILD: ${CHILD_PAGE_ID} [${CHILD_SPACE}] \"${CHILD_TITLE}\""
+    # Some output
+    printf "%s│\n" "${INDENT}"
+    printf "%s├- PAGE   : %s\n" "${INDENT}" "${PARENT_INFO}"
+    printf "%s└- %s.CHILD: %s [%s] \"%s\"\n" "${INDENT}" "${CHILD_IDX}" "${CHILD_PAGE_ID}" "${CHILD_SPACE}" "${CHILD_TITLE}"
 
     if [ ${STOP_BRANCH} -eq 0 ]; then
-      # call the script recursively for the next level
+      # Call the script recursively for the next level
       ./"$0" "${CHILD_PAGE_ID}" ${LEVEL}
     else
       # stop the recursion for this branch
-      echo -e "${INDENT}           ## STOP_BRANCH ON LEV.${LEVEL} ##\n"
+      printf "%s\t\t\t\t-> ## STOP_BRANCH ON LEV.%s ##\n" "${INDENT}" "${LEVEL}"
     fi
   done
 
   if [ ${CHILD_IDX} -lt 0 ]; then
-    # branch has no children
-    echo "${INDENT}├- PAGE   : ${PARENT_INFO}"
-    echo -e "${INDENT}└- x.CHILD: No children found\n"
+    # Branch has no children
+    printf "%s├- PAGE   : %s\n" "${INDENT}" "${PARENT_INFO}"
+    printf "%s└- x.CHILD: No children found\n" "${INDENT}"
   fi
 }

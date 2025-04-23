@@ -2,13 +2,18 @@
 # Copy this file to ~/.restapi/my.conf
 # Add your personal configuration
 
-CONF_BASE_URL_TEST=<confluence-url-test>
-CONF_BASE_URL_INTE=<confluence-url-integration>
-CONF_BASE_URL_PROD=<confuence-url-production>
+# Replace brackets with your confluence urls
+CONF_BASE_URL_TEST='<confluence-url-test>'
+CONF_BASE_URL_INTE='<confluence-url-integration>'
+CONF_BASE_URL_PROD='<confuence-url-production>'
 
-CONF_PAT_TEST=<confluence-personal-access-token-test>
-CONF_PAT_INTE=<confluence-personal-access-token-integration>
-CONF_PAT_PROD=<confluence-personal-access-token-production>
+# Replace brackets with your personal access tokens (without any quotes!)
+CONF_PAT_TEST='<confluence-personal-access-token-test>'
+CONF_PAT_INTE='<confluence-personal-access-token-integration>'
+CONF_PAT_PROD='<confluence-personal-access-token-production>'
 
 MY_BASE_URL=${CONF_BASE_URL_TEST}
 MY_PAT=${CONF_PAT_TEST}
+
+# Replace brackets with your spaces
+MY_SPACES='<space1> <space2> <space3>'
