@@ -51,3 +51,5 @@ PERM_READ_GROUP='.read.restrictions.group.results[]|.name + "(" + .type + ")|"'
 PERM_UPDATE_USER='.update.restrictions.user.results[]|.username + "(" + .type + ")|"'
 PERM_UPDATE_GROUP='.update.restrictions.group.results[]|.name + "(" + .type + ")|"'
 
+RESP_CSV_SPACE_RESULTS='.results[]| .key + ";" + .type + ";" + "status" + ";" + "\"" + .name + "\"" + ";" +  "\"" + .description.plain.value + "\""'
+ #+ (.metadata.labels.results[]|.name)'
